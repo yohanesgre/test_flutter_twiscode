@@ -26,7 +26,6 @@ class ItemCartState extends State<ItemCart> {
 
   @override
   void initState() {
-    log(itemCartModel.item.id);
     super.initState();
   }
 
@@ -182,7 +181,7 @@ class ItemCartState extends State<ItemCart> {
                                 Container(
                                   margin: const EdgeInsets.only(top: 8),
                                   child: Text(
-                                      itemCartModel.weight.toString() + " kg",
+                                      (itemCartModel.weight*itemCartModel.quantity).toString() + " kg",
                                       style: TextStyle(fontSize: 12)),
                                 )
                               ],

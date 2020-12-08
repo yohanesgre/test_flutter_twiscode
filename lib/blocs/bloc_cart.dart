@@ -36,7 +36,6 @@ class BlocCart extends BlocBase {
     if (contains.isNotEmpty) {
       contains.first.quantity++;
     } else {
-      log(item.weight);
       _cartItemList.add(ItemCartModel(item, 1, item.weight.isEmpty?0:double.parse(item.weight)));
     }
     _cartSubject.sink.add(_cartItemList);
