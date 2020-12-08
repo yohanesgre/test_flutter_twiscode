@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:test_flutter_dev_twistcode/models/item.dart';
+import 'package:test_flutter_dev_twistcode/models/reponse.dart'
+    as ResponseModel;
 import 'package:test_flutter_dev_twistcode/utils/constants.dart';
 
 class RemoteDataProvider {
@@ -16,23 +18,36 @@ class RemoteDataProvider {
     );
 
     var dio = Dio(options);
-    if (kDebugMode) {
+   /* if (kDebugMode) {
       dio.interceptors.add(PrettyDioLogger());
-    }
+    }*/
     return dio;
   }
 
-  Future<List<Item>> fetchItems() async {
+  Future<ResponseModel.Response> fetchItems() async {
     try {
       Response response =
           await dio.post('items/search/api_key/teampsisthebest/');
       if (response.statusCode == 200) {
-        return (response.data as List).map((x) => Item.fromJson(x)).toList();
+        return ResponseModel.Response(
+            listItem:
+                (response.data as List).map((x) => Item.fromJson(x)).toList(),
+            errMsg: "");
       } else {
-        throw Exception('Failed to load data!');
+        return ResponseModel.Response(
+            listItem: List(), errMsg: "Failed to load data!");
       }
-    } catch (error, stacktrace) {
-      throw Exception("Exception occurred: $error stackTrace: $stacktrace");
+    } catch (e, stacktrace) {
+      if (e.type == DioErrorType.CONNECT_TIMEOUT) {
+        return ResponseModel.Response(
+            listItem: List(), errMsg: "Connection Timeout!");
+      } else if (e.type == DioErrorType.RECEIVE_TIMEOUT) {
+        return ResponseModel.Response(
+            listItem: List(), errMsg: "Connection Timeout!");
+      } else {
+        return ResponseModel.Response(
+            listItem: List(), errMsg: "Error: $e, Stack: $stacktrace");
+      }
     }
   }
 }

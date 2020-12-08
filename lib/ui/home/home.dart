@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:test_flutter_dev_twistcode/blocs/bloc_cart.dart';
 import 'package:test_flutter_dev_twistcode/blocs/bloc_item.dart';
 import 'package:test_flutter_dev_twistcode/models/item.dart';
+import 'package:test_flutter_dev_twistcode/models/reponse.dart';
 
 import '../../service_locator.dart';
 import '../route_generator.dart';
@@ -55,23 +58,13 @@ class HomeState extends State<Home> {
           )
         ],
       ),
-      body: StreamBuilder(
-        stream: widget.blocItem.allItems,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return buildGridList(context, snapshot);
-          } else if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          }
-          return Center(child: CircularProgressIndicator());
-        },
-      ),
+      body: Platform.isIOS ? Container() : _buildWidgetListDataAndroid(),
     );
   }
 
-  Widget buildGridList(context, AsyncSnapshot<List<Item>> snapshot) {
+  Widget _buildGridList(context, AsyncSnapshot<Response> snapshot) {
     return GridView.builder(
-      itemCount: snapshot.data.length,
+      itemCount: snapshot.data.listItem.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: MediaQuery.of(context).size.width / 2 / 300.0,
@@ -80,10 +73,10 @@ class HomeState extends State<Home> {
         return GridTile(
           child: Builder(builder: (ctx) => InkResponse(
             enableFeedback: true,
-            child: ItemCard(snapshot.data[index]),
+            child: ItemCard(snapshot.data.listItem[index]),
             onTap: () {
-              widget.blocCart.addItemToCart(snapshot.data[index]);
-              moveToCartPage(ctx);
+              widget.blocCart.addItemToCart(snapshot.data.listItem[index]);
+              _moveToCartPage(ctx);
             },
           ),)
         );
@@ -91,7 +84,42 @@ class HomeState extends State<Home> {
     );
   }
 
-  void moveToCartPage(ctx) async {
+  Widget _buildWidgetListDataAndroid() {
+    return RefreshIndicator(
+      onRefresh: () async {
+        widget.blocItem.fetchAllItems();
+      },
+      child: StreamBuilder(
+        stream: widget.blocItem.allItems,
+        builder: (context, AsyncSnapshot<Response> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data.errMsg.isEmpty){
+              return _buildGridList(context, snapshot);
+            }else{
+              return Center(
+                child: Text(
+                  snapshot.data.errMsg,
+                  style: TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              );
+            }
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                snapshot.error.toString(),
+                style: TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            );
+          }
+          return Center(child: CircularProgressIndicator());
+        },
+      ),
+    );
+  }
+
+  _moveToCartPage(ctx) async {
     final result = await Navigator.of(context).pushNamed(cartRoute);
 
     final snackBar = SnackBar(

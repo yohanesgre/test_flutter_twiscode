@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:test_flutter_dev_twistcode/models/item.dart';
 import 'package:test_flutter_dev_twistcode/utils/constants.dart';
@@ -22,10 +23,16 @@ class ItemCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-                child: Image.network(
-                  URL_IMAGE + item.defaultPhoto.imgPath,
-                  height: 150.0,
+                // child: Image.network(
+                //   URL_IMAGE + item.defaultPhoto.imgPath,
+                //   height: 150.0,
+                //   fit: BoxFit.cover,
+                // ),
+                child: Image(
+                  image: CachedNetworkImageProvider(
+                      URL_IMAGE + item.defaultPhoto.imgPath),
                   fit: BoxFit.cover,
+                  height: 150.0,
                 ),
               ),
             ],
@@ -64,8 +71,7 @@ class ItemCard extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  "${Helpers.formatCurrency.format(
-                                      int.parse(item.price))}",
+                                  "${Helpers.formatCurrency.format(int.parse(item.price))}",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -92,13 +98,13 @@ class ItemCard extends StatelessWidget {
                                     ),
                                     Expanded(
                                         child: Text(
-                                          item.locationName,
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.grey),
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
+                                      item.locationName,
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey),
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
                                   ],
                                 ),
                               )
@@ -121,13 +127,13 @@ class ItemCard extends StatelessWidget {
                                     ),
                                     Expanded(
                                         child: Text(
-                                          item.addedUserName,
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.grey),
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
+                                      item.addedUserName,
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey),
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
                                   ],
                                 ),
                               )
@@ -141,7 +147,7 @@ class ItemCard extends StatelessWidget {
                               decoration: BoxDecoration(
                                   color: Colors.blue,
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
+                                      BorderRadius.all(Radius.circular(10))),
                               child: Wrap(
                                 alignment: WrapAlignment.center,
                                 children: [
@@ -155,11 +161,15 @@ class ItemCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    (item.isHalal == "1") ? Image.asset(
-                      'assets/images/halal.png',
-                      fit: BoxFit.fitWidth,
-                      width: 40,
-                    ) : SizedBox(width: 40,)
+                    (item.isHalal == "1")
+                        ? Image.asset(
+                            'assets/images/halal.png',
+                            fit: BoxFit.fitWidth,
+                            width: 40,
+                          )
+                        : SizedBox(
+                            width: 40,
+                          )
                   ],
                 ),
               ],
@@ -171,8 +181,7 @@ class ItemCard extends StatelessWidget {
   }
 }
 
-Widget textStock(String text) =>
-    Text(
+Widget textStock(String text) => Text(
       text.toUpperCase(),
       textAlign: TextAlign.center,
       style: TextStyle(color: Colors.white, fontSize: 10),
